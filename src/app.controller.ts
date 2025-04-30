@@ -1,12 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Query } from '@nestjs/common';
+import { CrawlerService } from './crawlers/crawler.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly crawlerService: CrawlerService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('start-crawler')
+  async startCrawler(@Query('cpf') cpf: string): Promise<string> {
+    if (!cpf) {
+      return 'Por favor, forneça o CPF via query param `cpf`';
+    }
+
+    await this.crawlerService.fetchData(cpf);
+    return 'Crawler executado com sucesso! Dados armazenados.';
   }
 }
